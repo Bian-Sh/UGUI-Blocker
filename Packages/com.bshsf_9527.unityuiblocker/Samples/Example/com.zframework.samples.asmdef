@@ -1,0 +1,17 @@
+{
+    "name": "com.zframework.samples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:66152d02b903bd249bcbc07b078dcab3",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
