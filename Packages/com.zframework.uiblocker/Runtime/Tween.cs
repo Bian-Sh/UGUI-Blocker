@@ -18,30 +18,32 @@ namespace zFramework.Anim
         {
             var startValue = image.color.a;
             var time = 0f;
+            var func = Easing.Get(ease);
             while (time < duration)
             {
                 time += Time.deltaTime;
-                var t = time / duration;
-                var a = Easing.Get(ease)(t);
-                image.color = new Color(image.color.r, image.color.g, image.color.b, a*endValue);
+                var t = func(time / duration);
+                var color = image.color;
+                color[3] = Mathf.Lerp(startValue, endValue, t);
+                image.color = color;
                 await Task.Yield();
             }
         }
-        public static async Task DoScaleAsync(this Transform target, Vector3 endValue, float duration,Ease ease)
+        public static async Task DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
         {
             var startValue = target.localScale;
             var time = 0f;
+            var func = Easing.Get(ease);
             while (time < duration)
             {
                 time += Time.deltaTime;
-                var t = time / duration;
-                var a = Easing.Get(ease)(t);
-                target.localScale = Vector3.Lerp(startValue, endValue, a);
+                var t = func(time / duration);
+                target.localScale = Vector3.Lerp(startValue, endValue, t);
                 await Task.Yield();
             }
         }
 
-        public static async Task DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 10, Space space = Space.Self)
+        public static async Task DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
         {
             var origin = space == Space.Self ? target.localPosition : target.position;
             var time = 0f;
