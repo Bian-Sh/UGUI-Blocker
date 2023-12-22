@@ -1,14 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System;
 using System.Linq;
-using System.ComponentModel.Design.Serialization;
-using Codice.Client.BaseCommands;
 using Object = UnityEngine.Object;
 using Cysharp.Threading.Tasks;
+using zFramework.Anim;
 
 namespace zFramework.UI
 {
@@ -27,17 +24,12 @@ namespace zFramework.UI
         private GraphicRaycaster raycaster;
 
         private float alpha = 0.5f;
-        private Color color = Color.clear;
-        private bool canCloseTarget = false;
         private GameObject blocker;
+        private bool ShouldFadeout => alpha > 0; // we need fadeout if user useto fadein
 
-        private bool IsFadeout => alpha > 0; // we need fadeout if user useto fadein
-
-        public Blocker(IBlockable target, Color color, bool canCloseTarget)
+        public Blocker(IBlockable target, Color color)
         {
             this.target = target;
-            this.color = color;
-            this.canCloseTarget = canCloseTarget;
             blockers.Add(target, this);
 
             // check target wether its UI or not 
@@ -82,10 +74,10 @@ namespace zFramework.UI
 
             // 4. Add Canvas component for target panel.
             innercanvas = go.gameObject.AddComponent<Canvas>();
-            raycaster = go.gameObject.AddComponent<GraphicRaycaster>();
             innercanvas.overrideSorting = true;
             innercanvas.sortingOrder = 25000 + blockers.Count;
-            
+            raycaster = go.gameObject.AddComponent<GraphicRaycaster>();
+
             // 5. Set the sorting layer of blocker's Canvas to be Lower just one unit than the target panel's Canvas.
             canvas.sortingLayerID = innercanvas.sortingLayerID;
             canvas.sortingOrder = innercanvas.sortingOrder - 1;
@@ -94,16 +86,16 @@ namespace zFramework.UI
             background.color = color;
             button = blocker.AddComponent<Button>();
             button.onClick.AddListener(OnButtonClicked);
-            blocker.hideFlags = HideFlags.HideInHierarchy;
+            //blocker.hideFlags = HideFlags.HideInHierarchy;
         }
 
         private async void OnButtonClicked()
         {
-            if (canCloseTarget)
-            {
-                await target.CloseAsync();
-                Destroy();
-            }
+                var close = await target.HandleBlockClickedAsync();
+                if (close)
+                {
+                    Destroy();
+                }
         }
 
         /// <summary>
@@ -113,13 +105,13 @@ namespace zFramework.UI
         /// <param name="alpha"> 最后的 透明值 </param>
         /// <param name="duration"> 渐显持续时长 </param>
         /// <returns></returns>
-        public async UniTask ShowAsync(float alpha, float duration, float delay)
+        internal async UniTask ShowAsync(float alpha, float duration, float delay)
         {
             this.alpha = alpha;
             async void DoDelayFadein()
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(delay));
-                await background.DOFade(alpha, duration).SetEase(Ease.InOutQuad);
+                await background.DoFadeAsync(alpha, duration, Ease.OutBack);
             }
             if (delay > 0)
             {
@@ -129,7 +121,7 @@ namespace zFramework.UI
             else
             {
                 // 必须等到 blocker 展示出来后才能展示 panel
-                await background.DOFade(alpha, duration).SetEase(Ease.InOutQuad);
+                await background.DoFadeAsync(alpha, duration, Ease.OutBack);
             }
         }
 
@@ -138,9 +130,12 @@ namespace zFramework.UI
         /// </summary>
         /// <param name="duration"> 渐隐持续时长 </param>
         /// <returns></returns>
-        public async UniTask CloseAsync(float duration = 0.5f)
+        internal async UniTask CloseAsync(float duration = 0.5f)
         {
-            await background.DOFade(0f, duration).SetEase(Ease.InOutQuad);
+            if (ShouldFadeout)
+            {
+                await background.DoFadeAsync(0f, duration, Ease.InBack);
+            }
             Destroy();
         }
 
@@ -152,7 +147,10 @@ namespace zFramework.UI
                 Object.DestroyImmediate(raycaster);
                 Object.DestroyImmediate(innercanvas);
                 Object.DestroyImmediate(blocker);
+                blockers.Remove(target);
             }
         }
+
+        internal static bool TryGet(IBlockable blockable, out Blocker blocker) => blockers.TryGetValue(blockable, value: out blocker);
     }
 }

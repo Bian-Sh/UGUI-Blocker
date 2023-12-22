@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.bshsf.unityuiblocker": {
-      "version": "file:com.bshsf_9527.unityuiblocker",
+      "version": "file:com.zframework.uiblocker",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
