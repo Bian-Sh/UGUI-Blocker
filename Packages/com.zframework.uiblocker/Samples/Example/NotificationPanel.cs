@@ -24,7 +24,7 @@ namespace zFramework.Example
             await transform.DoScaleAsync(Vector3.one, 0.5f, Ease.OutBack);
 
             var index = await UniTask.WhenAny(confirmButton.OnClickAsync(), cancelButton.OnClickAsync());
-            _ = transform.DoScaleAsync(Vector3.one * 0.01f, 0.3f, Ease.Linear);
+            _ = transform.DoScaleAsync(Vector3.one * 0.01f, 0.3f, Ease.InBack);
             await this.UnblockAsync(0.5f);
             gameObject.SetActive(false);
             return index; // result should never be wait

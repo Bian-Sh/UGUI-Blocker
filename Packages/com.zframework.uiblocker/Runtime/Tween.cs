@@ -11,6 +11,15 @@ namespace zFramework.Anim
     {
         public static async UniTask DoFadeAsync(this Image image, float endValue, float duration, Ease ease)
         {
+            // duration 为 0 时，直接设置为 endValue
+            if (duration == 0)
+            {
+                var color = image.color;
+                color[3] = endValue;
+                image.color = color;
+                return;
+            }
+
             var startValue = image.color.a;
             var time = 0f;
             var func = Easing.Get(ease);
@@ -26,6 +35,13 @@ namespace zFramework.Anim
         }
         public static async UniTask DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
         {
+            // duration 为 0 时，直接设置为 endValue
+            if (duration == 0)
+            {
+                target.localScale = endValue;
+                return;
+            }
+
             var startValue = target.localScale;
             var time = 0f;
             var func = Easing.Get(ease);
@@ -40,6 +56,10 @@ namespace zFramework.Anim
 
         public static async UniTask DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
         {
+            if (duration == 0)
+            {
+                return;
+            }
             var origin = space == Space.Self ? target.localPosition : target.position;
             var time = 0f;
             while (time < duration)
@@ -66,8 +86,6 @@ namespace zFramework.Anim
                 target.position = origin;
             }
         }
-
-
     }
 
     public enum Ease
