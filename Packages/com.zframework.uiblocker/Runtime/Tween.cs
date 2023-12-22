@@ -1,11 +1,6 @@
-#if UNITASK_EABLED
-using Task = Cysharp.Threading.Tasks.UniTask;
-#else
-using System.Threading.Tasks;
-#endif
 using UnityEngine;
-using Random = UnityEngine.Random;
-using Image = UnityEngine.UI.Image;
+using Cysharp.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace zFramework.Anim
 {
@@ -14,7 +9,7 @@ namespace zFramework.Anim
     // 实现 Transform.DoScaleAsync
     public static class TweenExtension
     {
-        public static async Task DoFadeAsync(this Image image, float endValue, float duration, Ease ease)
+        public static async UniTask DoFadeAsync(this Image image, float endValue, float duration, Ease ease)
         {
             var startValue = image.color.a;
             var time = 0f;
@@ -26,10 +21,10 @@ namespace zFramework.Anim
                 var color = image.color;
                 color[3] = Mathf.Lerp(startValue, endValue, t);
                 image.color = color;
-                await Task.Yield();
+                await UniTask.Yield();
             }
         }
-        public static async Task DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
+        public static async UniTask DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
         {
             var startValue = target.localScale;
             var time = 0f;
@@ -39,11 +34,11 @@ namespace zFramework.Anim
                 time += Time.deltaTime;
                 var t = func(time / duration);
                 target.localScale = Vector3.Lerp(startValue, endValue, t);
-                await Task.Yield();
+                await UniTask.Yield();
             }
         }
 
-        public static async Task DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
+        public static async UniTask DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
         {
             var origin = space == Space.Self ? target.localPosition : target.position;
             var time = 0f;
@@ -60,9 +55,18 @@ namespace zFramework.Anim
                 {
                     target.position = Vector3.Lerp(target.position, pos, vibrato * Time.deltaTime);
                 }
-                await Task.Yield();
+                await UniTask.Yield();
+            }
+            if (space == Space.Self)
+            {
+                target.localPosition = origin;
+            }
+            else
+            {
+                target.position = origin;
             }
         }
+
 
     }
 
