@@ -20,7 +20,7 @@ namespace zFramework.UI
         /// <param name="duration">阻塞器的持续时间</param>
         /// <param name="delay">阻塞器的延迟时间</param>
         /// <returns></returns>
-        public static async UniTask BlockAsync(this IBlockable blockable, Color color,float alpha, float duration, float delay)
+        public static async UniTask BlockAsync(this IBlockable blockable, Color color, float alpha, float duration, float delay)
         {
             var blocker = new Blocker(blockable, color);
             await blocker.ShowAsync(alpha, duration, delay);
@@ -37,6 +37,10 @@ namespace zFramework.UI
             if (Blocker.TryGet(blockable, out var blocker))
             {
                 await blocker.CloseAsync(duration);
+            }
+            else
+            {
+                Debug.LogWarning($"Blocker of {blockable} is not exist");
             }
         }
 
