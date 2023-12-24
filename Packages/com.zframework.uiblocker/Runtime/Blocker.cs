@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using Object = UnityEngine.Object;
-using zFramework.Anim;
+using zFramework.Ex;
 using System.Threading.Tasks;
 
 namespace zFramework.UI

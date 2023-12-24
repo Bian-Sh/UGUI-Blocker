@@ -24,7 +24,8 @@ public class PanelController : MonoBehaviour
             var title = "Panel without a Blocker";
             var content = "This panel will be overlaid by other UI as it does not use a blocker！";
             var idx = await panel2.ShowAsync(title, content);
-            Debug.Log("user selected : " + (idx == 0 ? "确定" : (idx == -1 ? "用户取消操作" : "取消")));
+
+            Debug.Log("user selected : " +idx + (idx == 0 ? "确定" : (idx == -1 ? "用户取消操作" : "取消")));
         }
     }
 
@@ -36,7 +37,7 @@ public class PanelController : MonoBehaviour
             var title = "Panel with a Blocker";
             var content = "This panel will be rendered on the top layer！";
             var idx = await panel.ShowAsync(title, content);
-            Debug.Log("user selected : " + (idx == 0 ? "确定" : (idx == -1 ? "用户取消操作" : "取消")));
+            Debug.Log("user selected : " + idx + (idx == 0 ? "确定" : (idx == -1 ? "用户取消操作" : "取消")));
         }
     }
 }

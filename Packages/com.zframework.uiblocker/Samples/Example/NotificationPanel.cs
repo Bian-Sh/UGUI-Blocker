@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using zFramework.Anim;
+using zFramework.Ex;
 using zFramework.UI;
 
 namespace zFramework.Example
@@ -39,20 +39,7 @@ namespace zFramework.Example
                 if (useBlocker) await this.BlockAsync(Color.black, 0.8f, 0.3f, 0.1f);
 
                 await transform.DoScaleAsync(Vector3.one, 0.5f, Ease.OutBack);
-                var tasks = new Task[2]
-                {
-                    confirmButton.OnClickAsync(cts.Token),
-                    cancelButton.OnClickAsync(cts.Token)
-                };
-                var task = await Task.WhenAny(tasks);
-                if (task.IsCanceled)
-                {
-                    index = -1;
-                }
-                else
-                {
-                    index = Array.IndexOf(tasks, task);
-                }
+                index = await TaskExtension.WhenAny(confirmButton.OnClickAsync(cts.Token), cancelButton.OnClickAsync(cts.Token));
                 // if you want blocker fadeout along with panel , you should use "_= " to make them run in parallel
                 _ = transform.DoScaleAsync(Vector3.one * 0.01f, 0.5f, Ease.InBack);
                 //If the panel fadeout duration is less than that of the blocker, the blocker will fade out first and then the panel will suddenly become inactive.

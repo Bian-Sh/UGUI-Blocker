@@ -1,5 +1,6 @@
-using System.Threading.Tasks;
 using UnityEngine;
+using zFramework.UI;
+using System.Threading.Tasks;
 
 // 小技巧：
 // 1. color = Color.clear 时，Blocker 完全透明
@@ -7,7 +8,7 @@ using UnityEngine;
 // 3. duration = 0 时，Blocker 的 Color 设置立即生效
 // 4. delay = 0 时，你会看到先显示 Blocker 再显示 Target Panel
 // 5. delay >0 时，你可以通过控制 delay 来控制 Blocker 和 Target Panel 的显示先后顺序
-namespace zFramework.UI
+namespace zFramework.Ex
 {
     public static class UIBlockExtension
     {
@@ -43,6 +44,5 @@ namespace zFramework.UI
                 Debug.LogWarning($"Blocker of {blockable} is not exist");
             }
         }
-
     }
 }

@@ -1,17 +1,21 @@
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.UI;
-
-public static class ButtonExtension
+namespace zFramework.Ex
 {
-    public static Task OnClickAsync(this Button button, CancellationToken cancellationToken)
+    public static class ButtonExtension
     {
-        var tcs = new TaskCompletionSource<bool>();
-        cancellationToken.Register(() => tcs.TrySetCanceled(), false);
-        button.onClick.AddListener(() =>
+        public static Task OnClickAsync(this Button button, CancellationToken cancellationToken)
         {
-            tcs.TrySetResult(true);
-        });
-        return tcs.Task;
+            var tcs = new TaskCompletionSource<bool>();
+            cancellationToken.Register(() => tcs.TrySetCanceled(), false);
+            void RegistOnClickedCallback()
+            {
+                tcs.TrySetResult(true);
+                button.onClick.RemoveListener(RegistOnClickedCallback);
+            }
+            button.onClick.AddListener(RegistOnClickedCallback);
+            return tcs.Task;
+        }
     }
 }

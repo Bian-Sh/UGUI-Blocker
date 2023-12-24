@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 
-namespace zFramework.Anim
+namespace zFramework.Ex
 {
     // 实现 Image.DoFadeAsync
     // 实现 Transform.DOShakePosition
