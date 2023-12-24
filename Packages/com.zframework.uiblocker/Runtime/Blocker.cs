@@ -85,21 +85,8 @@ namespace zFramework.UI
             color.a = 0f;
             background.color = color;
             button = blocker.AddComponent<Button>();
-            button.onClick.AddListener(OnButtonClicked);
+            button.onClick.AddListener(target.HandleBlockClickedAsync);
             blocker.hideFlags = HideFlags.HideInHierarchy;
-        }
-
-        private async void OnButtonClicked()
-        {
-            var result = await target.HandleBlockClickedAsync();
-            if (result.close)
-            {
-                if (ShouldFadeout)
-                {
-                    await background.DoFadeAsync(0f, result.duration, Ease.InBack);
-                }
-                Destroy();
-            }
         }
 
         /// <summary>
@@ -156,17 +143,5 @@ namespace zFramework.UI
         }
 
         internal static bool TryGet(IBlockable blockable, out Blocker blocker) => blockers.TryGetValue(blockable, value: out blocker);
-
-        public struct Context
-        {
-            /// <summary>
-            ///  用户决定是否关闭 Blocker，ture =关闭
-            /// </summary>
-            public bool close;
-            /// <summary>
-            ///  用户指定 Blocker 渐隐的时长
-            /// </summary>
-            public float duration;
-        }
     }
 }
