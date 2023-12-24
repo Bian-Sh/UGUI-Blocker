@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 namespace zFramework.UI
 {
     public interface IBlockable
@@ -8,7 +8,7 @@ namespace zFramework.UI
         ///  如果你的面板中 await 了很多Task，请在关闭前完全取消他们
         /// </summary>
         /// <returns>是否关闭 blocker ，ture =关闭</returns>
-        UniTask<Blocker.Context> HandleBlockClickedAsync();
+        Task<Blocker.Context> HandleBlockClickedAsync();
 
         // 取消 Task 的一个可能性演示
         /*

@@ -1,6 +1,6 @@
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 namespace zFramework.Anim
 {
@@ -9,7 +9,7 @@ namespace zFramework.Anim
     // 实现 Transform.DoScaleAsync
     public static class TweenExtension
     {
-        public static async UniTask DoFadeAsync(this Image image, float endValue, float duration, Ease ease)
+        public static async Task DoFadeAsync(this Image image, float endValue, float duration, Ease ease)
         {
             // duration 为 0 时，直接设置为 endValue
             if (duration == 0)
@@ -23,17 +23,17 @@ namespace zFramework.Anim
             var startValue = image.color.a;
             var time = 0f;
             var func = Easing.Get(ease);
-            while (time < duration)
+            while (time < duration && image)
             {
                 time += Time.deltaTime;
                 var t = func(time / duration);
                 var color = image.color;
                 color[3] = Mathf.Lerp(startValue, endValue, t);
                 image.color = color;
-                await UniTask.Yield();
+                await Task.Yield();
             }
         }
-        public static async UniTask DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
+        public static async Task DoScaleAsync(this Transform target, Vector3 endValue, float duration, Ease ease)
         {
             // duration 为 0 时，直接设置为 endValue
             if (duration == 0)
@@ -45,16 +45,16 @@ namespace zFramework.Anim
             var startValue = target.localScale;
             var time = 0f;
             var func = Easing.Get(ease);
-            while (time < duration)
+            while (time < duration && target)
             {
                 time += Time.deltaTime;
                 var t = func(time / duration);
                 target.localScale = Vector3.Lerp(startValue, endValue, t);
-                await UniTask.Yield();
+                await Task.Yield();
             }
         }
 
-        public static async UniTask DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
+        public static async Task DoShackPositionAsync(this Transform target, float duration, Vector3 strength, int vibrato = 50, Space space = Space.Self)
         {
             if (duration == 0)
             {
@@ -62,7 +62,7 @@ namespace zFramework.Anim
             }
             var origin = space == Space.Self ? target.localPosition : target.position;
             var time = 0f;
-            while (time < duration)
+            while (time < duration && target)
             {
                 time += Time.deltaTime;
                 var randomVector = Random.insideUnitSphere;
@@ -75,7 +75,7 @@ namespace zFramework.Anim
                 {
                     target.position = Vector3.Lerp(target.position, pos, vibrato * Time.deltaTime);
                 }
-                await UniTask.Yield();
+                await Task.Yield();
             }
             if (space == Space.Self)
             {

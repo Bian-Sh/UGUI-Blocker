@@ -4,28 +4,28 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using Object = UnityEngine.Object;
-using Cysharp.Threading.Tasks;
 using zFramework.Anim;
+using System.Threading.Tasks;
 
 namespace zFramework.UI
 {
     public class Blocker
     {
         // 支持 Blocker 嵌套
-        private static Dictionary<IBlockable, Blocker> blockers = new();
         [RuntimeInitializeOnLoadMethod]
         private static void Init() => UnityEngine.SceneManagement.SceneManager.sceneLoaded += (_, _) => blockers?.Clear();
 
-        private IBlockable target;
-        private Button button;
-        private Image background;
-        private Canvas innercanvas;
-        private Canvas rootCanvas;
-        private GraphicRaycaster raycaster;
+        readonly IBlockable target;
+        readonly Button button;
+        readonly Image background;
+        readonly Canvas innercanvas;
+        readonly Canvas rootCanvas;
+        readonly GraphicRaycaster raycaster;
 
         private float alpha = 0.5f;
-        private GameObject blocker;
+        readonly GameObject blocker;
         private bool ShouldFadeout => alpha > 0; // we need fadeout if user useto fadein
+        static readonly Dictionary<IBlockable, Blocker> blockers = new();
 
         public Blocker(IBlockable target, Color color)
         {
@@ -109,12 +109,12 @@ namespace zFramework.UI
         /// <param name="alpha"> 最后的 透明值 </param>
         /// <param name="duration"> 渐显持续时长 </param>
         /// <returns></returns>
-        internal async UniTask ShowAsync(float alpha, float duration, float delay)
+        internal async Task ShowAsync(float alpha, float duration, float delay)
         {
             this.alpha = alpha;
             async void DoDelayFadein()
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(delay));
+                await Task.Delay(TimeSpan.FromSeconds(delay));
                 await background.DoFadeAsync(alpha, duration, Ease.OutBack);
             }
             if (delay > 0)
@@ -134,7 +134,7 @@ namespace zFramework.UI
         /// </summary>
         /// <param name="duration"> 渐隐持续时长 </param>
         /// <returns></returns>
-        internal async UniTask CloseAsync(float duration = 0.5f)
+        internal async Task CloseAsync(float duration = 0.5f)
         {
             if (ShouldFadeout)
             {

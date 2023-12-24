@@ -1,6 +1,6 @@
-using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using zFramework.Anim;
@@ -21,7 +21,7 @@ namespace zFramework.Example
 
         public bool closeByBlock = false;
         public bool useBlocker = true;
-        public async UniTask<int> ShowAsync(string title, string content)
+        public async Task<int> ShowAsync(string title, string content)
         {
             cts = new CancellationTokenSource();
             this.title.text = title;
@@ -39,8 +39,20 @@ namespace zFramework.Example
                 if (useBlocker) await this.BlockAsync(Color.black, 0.8f, 0.3f, 0.1f);
 
                 await transform.DoScaleAsync(Vector3.one, 0.5f, Ease.OutBack);
-                index = await UniTask.WhenAny(confirmButton.OnClickAsync(cts.Token), cancelButton.OnClickAsync(cts.Token));
-
+                var tasks = new Task[2]
+                {
+                    confirmButton.OnClickAsync(cts.Token),
+                    cancelButton.OnClickAsync(cts.Token)
+                };
+                var task = await Task.WhenAny(tasks);
+                if (task.IsCanceled)
+                {
+                    index = -1;
+                }
+                else
+                {
+                    index = Array.IndexOf(tasks, task);
+                }
                 // if you want blocker fadeout along with panel , you should use "_= " to make them run in parallel
                 _ = transform.DoScaleAsync(Vector3.one * 0.01f, 0.5f, Ease.InBack);
                 //If the panel fadeout duration is less than that of the blocker, the blocker will fade out first and then the panel will suddenly become inactive.
@@ -48,14 +60,19 @@ namespace zFramework.Example
                 await this.UnblockAsync(0.5f);
                 gameObject.SetActive(false);
             }
-            catch (Exception e) when (e is OperationCanceledException)
+            catch (Exception e) when (e is not OperationCanceledException)
             {
                 // if  exception is OperationCanceledException,do nothing
+                Debug.LogException(e);
+            }
+            finally
+            {
+                cts?.Dispose();
             }
             return index; // result should never be wait 
         }
 
-        public async UniTask<Blocker.Context> HandleBlockClickedAsync()
+        public async Task<Blocker.Context> HandleBlockClickedAsync()
         {
             if (closeByBlock)
             {

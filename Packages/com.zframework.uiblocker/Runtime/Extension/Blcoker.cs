@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 
 // 小技巧：
@@ -20,7 +20,7 @@ namespace zFramework.UI
         /// <param name="duration">阻塞器的持续时间</param>
         /// <param name="delay">阻塞器的延迟时间</param>
         /// <returns></returns>
-        public static async UniTask BlockAsync(this IBlockable blockable, Color color, float alpha, float duration, float delay)
+        public static async Task BlockAsync(this IBlockable blockable, Color color, float alpha, float duration, float delay)
         {
             var blocker = new Blocker(blockable, color);
             await blocker.ShowAsync(alpha, duration, delay);
@@ -32,7 +32,7 @@ namespace zFramework.UI
         /// <param name="blockable">调用方</param>
         /// <param name="duration">渐隐的时长</param>
         /// <returns></returns>
-        public static async UniTask UnblockAsync(this IBlockable blockable, float duration)
+        public static async Task UnblockAsync(this IBlockable blockable, float duration)
         {
             if (Blocker.TryGet(blockable, out var blocker))
             {
