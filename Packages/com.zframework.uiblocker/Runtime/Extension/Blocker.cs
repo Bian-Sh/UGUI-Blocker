@@ -28,31 +28,7 @@ namespace zFramework.Ex
         public static async Task BlockAsync(this IBlockable blockable, Color color, float alpha, float duration, float delay)
         {
             var blocker = new Blocker(blockable, color);
-            // 如果 blockable 存在 CanvasGroup 组件，则记录 origin block raycast 值，然后设置为 false ，完成后恢复
-            var cg = (blockable as MonoBehaviour).GetComponent<CanvasGroup>();
-            bool? originBlockRaycast = null;
-            if (!cg)
-            {
-                cg = (blockable as MonoBehaviour).gameObject.AddComponent<CanvasGroup>();
-            }
-            // 延迟 delay + duration 秒后才能够处理 BlockRaycast
-            async void DelayHandleBlockRaycastAsync()
-            {
-                await Task.Delay((int)((delay + duration) * 1000));
-                if (cg)
-                {
-                    if (originBlockRaycast.HasValue)
-                    {
-                        cg.blocksRaycasts = originBlockRaycast.Value;
-                    }
-                    else
-                    {
-                        Object.Destroy(cg);
-                    }
-                }
-            }
             await blocker.ShowAsync(alpha, duration, delay);
-            DelayHandleBlockRaycastAsync();
         }
 
         /// <summary>
@@ -65,31 +41,7 @@ namespace zFramework.Ex
         {
             if (Blocker.TryGet(blockable, out var blocker))
             {
-                // 使用 CanvasGroup 控制 BlockRaycast,避免Blocker 隐藏过程中用户误触面板
-                var cg = (blockable as MonoBehaviour).GetComponent<CanvasGroup>();
-                bool? originBlockRaycast = null;
-                if (!cg)
-                {
-                    cg = (blockable as MonoBehaviour).gameObject.AddComponent<CanvasGroup>();
-                }
-                else
-                {
-                    originBlockRaycast = cg.blocksRaycasts;
-                }
-                cg.blocksRaycasts = false;
                 await blocker.CloseAsync(duration);
-                if (originBlockRaycast.HasValue)
-                {
-                    cg.blocksRaycasts = originBlockRaycast.Value;
-                }
-                else
-                {
-                    Object.Destroy(cg);
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Blocker of {blockable} is not exist");
             }
         }
     }
